@@ -1,0 +1,6 @@
+#pytesseract.pytesseract.tesseract_cmd 
+D:\Tesseract-OCR\tesseract.exe
+#夜間班/假日班
+夜間班
+#信息
+信息一
