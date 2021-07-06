@@ -13,7 +13,7 @@ pygraphviz==1.7
 pygsheets==2.0.5
 python-dotenv==0.10.3
 requests==2.22.0
-six==1.12.0
+six==1.13.0
 transitions==0.6.9
 urllib3==1.25.6
 werkzeug==0.16.0
