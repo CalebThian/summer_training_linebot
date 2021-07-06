@@ -9,7 +9,7 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 from fsm import TocMachine
 from utils import send_text_message
-import pygraphviz
+#import pygraphviz
 import psycopg2
 
 load_dotenv()
@@ -116,20 +116,13 @@ def webhook_handler():
     return "OK"
 
 
-@app.route("/show-fsm", methods=["GET"])
-def show_fsm():
-    machine.get_graph().draw("fsm.png", prog="dot", format="png")
-    return send_file("fsm.png", mimetype="image/png")
+#@app.route("/show-fsm", methods=["GET"])
+#def show_fsm():
+#    machine.get_graph().draw("fsm.png", prog="dot", format="png")
+#    return send_file("fsm.png", mimetype="image/png")
 
 
 if __name__ == "__main__":
-    # Delete the Database exists
-    # DATABASE_URL = os.popen('heroku config:get DATABASE_URL -a who-you-are').read()[:-1]
-    # conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    # cursor = conn.cursor()
-    # delete_table_query = '''DROP TABLE IF EXISTS rel_db'''
-    # cursor.execute(delete_table_query)
-    # conn.commit()
-    machine.get_graph().draw("fsm.png", prog="dot", format="png")
+    #machine.get_graph().draw("fsm.png", prog="dot", format="png")
     port = os.environ.get("PORT", 8000)
     app.run(host="0.0.0.0", port=port, debug=True)
