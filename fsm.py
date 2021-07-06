@@ -19,6 +19,17 @@ class TocMachine(GraphMachine):
         self.attendees = set()
         self.confirm_attendees = set()
         
+    def is_going_to_user(self,event):
+        text=event.message.text
+        if text == "中斷點名":
+            return True
+    
+    def on_enter_user(self,event):
+        reply_token = event.reply_token
+        text = "已中斷點名"
+        send_text_message(reply_token,text)
+        self.go_back()
+        
     def is_going_to_greetings(self,event):
         text=event.message.text
         if "打招呼" in text:
@@ -32,7 +43,7 @@ class TocMachine(GraphMachine):
     
     def is_going_to_class(self,event):
         text=event.message.text
-        if text = "點名":
+        if text == "點名":
             return True
         
     def on_enter_class(self,event):
