@@ -20,7 +20,8 @@ machine = TocMachine(
             "class",
             "mes",
             "rollcall",
-            "finish"],
+            "finish",
+            "end"],
     transitions=[
         {"trigger": "advance","source": "user","dest": "greetings","conditions": "is_going_to_greetings"},
         {"trigger": "go_back","source": "greetings","dest": "user"},
@@ -34,7 +35,9 @@ machine = TocMachine(
         {"trigger": "advance","source": "rollcall","dest": "rollcall","conditions": "is_rollcalling"},
         
         {"trigger": "advance","source": "rollcall","dest": "finish","conditions": "is_going_to_finish"},
-        {"trigger": "go_back","source": "finish","dest": "user"}
+        {"trigger": "go_back","source": "finish","dest": "user"},
+        {"trigger": "advance","source": ["class","mes","rollcall"],"dest": "end","conditions": "is_going_to_end"},
+        {"trigger": "go_back","source": "end","dest": "user"}
     ],
     initial="user",
     auto_transitions=False,
