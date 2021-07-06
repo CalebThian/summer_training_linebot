@@ -36,11 +36,7 @@ def open_google_sheet(target_gs = "https://docs.google.com/spreadsheets/d/1ohd8Y
     return sht
 
 # 點名
-def attend(name,message,target_gs = None):
-    if target_gs:
-        sht = open_google_sheet(target_gs = target_gs)
-    else:
-        sht = open_google_sheet()
+def attend(name,message,sht):
     wks = sht.worksheets()
     col_list = list(string.ascii_uppercase)
     item_row = 2
@@ -57,6 +53,7 @@ def attend(name,message,target_gs = None):
             name_col = alpha
             break
     '''
+    
     # 找對應格子， 設爲True
     # 因爲信息對應的column也是已知，所以這裏用dict記住就可以了
     message_col = dict()
@@ -64,21 +61,68 @@ def attend(name,message,target_gs = None):
     for i in range(12):
         message_col[mes_list[i].value] = col_list[4+i]
 
-        
+    
+    # 點名
     for i in range(1,len(wks)):
         wks_cur = wks[i]
         ite = 3
         while True:
+            print("\r"+wks_cur.title+"--"+name_col + str(ite),end = "")
             if wks_cur.cell(name_col + str(ite)).value == name:
                 wks_cur.update_value(message_col[message] + str(ite),'True')
-                return
+                return 1
             elif wks_cur.cell(name_col + str(ite)).value == "":
                 break
             else:
                 ite = ite+1
 
+    # Failed to find the name
+    return 0
+
+def rollcall(name_list,message,sht):
+    success = []
+    fail = []
+    for name in name_list.split():
+        print(name)
+        if attend(name,message,sht):
+            success.append(name)
+        else:
+            fail.append(name)
+    return success,fail
+
+def create_dict(message,sht):
+    d_list = []
+    
+    message_col = dict()
+    mes_list = sht[1].range('E2:P2')[0]
+    for i in range(12):
+        message_col[mes_list[i].value] = col_list[4+i]
+    
+    skip_1_flag = True
+    for wks in sht:
+        if skip_1_flag:
+            skip_1_flag = False
+            continue
+        
+        name_list = wks.get_values_batch(['B3:B'])[0][2:]
+        d = dict()
+        for i in range(len(name_list)):
+            if len(name_list[i]) == 0:
+                continue
+            
+            name = name_list[i][0]
+            d[name] = message_col[message] + str(3+i)
+        d_list.append(d)
+    
+    return d_list
+
 
 if __name__ == '__main__':
     #A1 = sht[1].cell('E51')
     #sht[1].update_value('E51','True')
-    attend('田家樂','信息二')
+    sht = open_google_sheet('https://docs.google.com/spreadsheets/d/1ohd8YRgh9ghewZaSP39W0dhPyKw_xI0kbWu_SoClw3A/edit#gid=680064596') 
+    wks = sht[2]
+    print(wks.get_values_batch(['B3:B'])[0][2:])
+    d = create_dict("信息一",sht)
+    print(d)
+    #rollcall('静音\n謝亞城 田家樂 高苡程\n虛俊翰 恩慈高\n黃柏\n陳孜安 其恩\n黃凡芸 其恩路\n張晴雯 曾業偉\n王宏惠\nHsin 致美張\nChunyi\n得真','信息一',sht)

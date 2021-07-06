@@ -17,10 +17,21 @@ load_dotenv()
 
 machine = TocMachine(
     states=["user",
-            "echo"],
+            "echo",
+            "class",
+            "mes",
+            "rollcall"],
     transitions=[
         {"trigger": "advance","source": "user","dest": "echo","conditions": "is_going_to_echo"},
-        {"trigger": "go_back","source": "echo","dest": "user"}
+        {"trigger": "go_back","source": "echo","dest": "user"},
+        
+        {"trigger": "advance","source": "user","dest": "class","conditions": "is_going_to_class"},
+        
+        {"trigger": "advance","source": "class","dest": "mes","conditions": "is_going_to_mes"},
+        
+        {"trigger": "advance","source": "mes","dest": "rollcall","conditions": "is_going_to_rollcall"},
+        
+        {"trigger": "advance","source": "rollcall","dest": "rollcall","conditions": "is_rollcalling"}
     ],
     initial="user",
     auto_transitions=False,
