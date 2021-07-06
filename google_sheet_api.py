@@ -26,6 +26,10 @@ def get_sheet_list(sht):
 
 # Initialize: gc 儲存 我們的授權金鑰 json 放置的位子。
 def initialize(service_file = "key.json"):
+    try:
+        myfile = open(service_file, "r") # or "a+", whatever you need                            # exit the loop
+    except IOError:
+        input("Could not open key.json\n")
     gc = pygsheets.authorize(service_file = service_file)
     return gc
 
