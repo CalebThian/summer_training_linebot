@@ -38,28 +38,23 @@ def open_google_sheet(target_gs = "https://docs.google.com/spreadsheets/d/1ohd8Y
 # 確認每個名字與其對應的點名格子編碼
 def create_dict(message,sht):
     d_list = []
-    
     message_col = dict()
     mes_list = sht[1].range('E2:P2')[0]
+
     for i in range(12):
         message_col[mes_list[i].value] = col_list[4+i]
     
-    skip_1_flag = True
-    for wks in sht:
-        if skip_1_flag:
-            skip_1_flag = False
-            continue
+    for i in range(1,len(sht.worksheets())):
         
+        wks = sht[i]
         name_list = wks.get_values_batch(['B3:B'])[0][2:]
         d = dict()
         for i in range(len(name_list)):
             if len(name_list[i]) == 0:
                 continue
-            
             name = name_list[i][0]
             d[name] = message_col[message] + str(3+i)
         d_list.append(d)
-    
     return d_list
 
 def get_cell(target,d_list):
@@ -100,11 +95,10 @@ def attend(tick,sht):
 
 
 
-def rollcall(name_list,message,sht):
+def rollcall(name_list,d,sht):
     success = []
     tick = [[],[],[],[],[],[]]
     fail = []
-    d = create_dict(message,sht)
     for name in name_list.split():
         print(name)
         i,cell = get_cell(name,d)
@@ -126,7 +120,8 @@ if __name__ == '__main__':
     #A1 = sht[1].cell('E51')
     #sht[1].update_value('E51','True')
     sht = open_google_sheet('https://docs.google.com/spreadsheets/d/1ohd8YRgh9ghewZaSP39W0dhPyKw_xI0kbWu_SoClw3A/edit#gid=680064596') 
+    print(len(sht.worksheets()))
     d = create_dict("信息一",sht)
-    target = ""
+    #target = ""
     #i,cell = get_cell(target,d)
-    s,c = rollcall('静音\n謝亞城 田家樂 高苡程\n虛俊翰 恩慈高\n黃柏\n陳孜安 其恩\n黃凡芸 其恩路\n張晴雯 曾業偉\n王宏惠\nHsin 致美張\nChunyi\n得真','信息一',sht)
+    s,c = rollcall('静音\n謝亞城 田家樂 高苡程\n虛俊翰 恩慈高\n黃柏\n陳孜安 其恩\n黃凡芸 其恩路\n張晴雯 曾業偉\n王宏惠\nHsin 致美張\nChunyi\n得真',d,sht)

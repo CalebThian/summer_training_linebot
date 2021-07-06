@@ -4,13 +4,16 @@ from utils import send_text_message,send_button_message,send_image_message
 
 from linebot.models import MessageTemplateAction
 
-from google_sheet_api import rollcall,open_google_sheet
+from google_sheet_api import rollcall,open_google_sheet,create_dict
 
 class TocMachine(GraphMachine):
+    
     def __init__(self, **machine_configs):
         self.machine = GraphMachine(model=self, **machine_configs)
         self.is_rollcalling_flag = False
-    
+        self.sht = None
+        self.d = None
+        
     def is_going_to_echo(self,event):
         text=event.message.text
         if "點名" in text:
@@ -40,8 +43,7 @@ class TocMachine(GraphMachine):
                 gs = 'https://docs.google.com/spreadsheets/d/1ohd8YRgh9ghewZaSP39W0dhPyKw_xI0kbWu_SoClw3A/edit#gid=680064596'
             elif text == '2':
                 gs = 'https://docs.google.com/spreadsheets/d/1ohd8YRgh9ghewZaSP39W0dhPyKw_xI0kbWu_SoClw3A/edit#gid=680064596'
-            global sht
-            sht = open_google_sheet(gs)
+            self.sht = open_google_sheet(gs)
             return True
         
     def on_enter_mes(self,event):
@@ -63,22 +65,26 @@ class TocMachine(GraphMachine):
                '信息十',
                '信息十一',
                '信息十二']
-        global message
         for mes_name in mes:
-            for m in mes_name:
-                print(m,mes_name)
-                if m in text:
-                    message = m
-                    return True
+            if mes_name in text:
+                message = mes_name
+                print("If success:")
+                self.d = create_dict(message,self.sht)
+                print("Success!")
+                return True
         
     def on_enter_rollcall(self,event):
         reply_token = event.reply_token
+        print("flag = " + str(self.is_rollcalling_flag))
         if not self.is_rollcalling_flag:
             text = "好的，可以開始點名咯"
             self.is_rollcalling_flag = True
             send_text_message(reply_token,text) 
         elif self.is_rollcalling_flag:
-            success,fail = rollcall(event.message.text,message,sht)    
+            print("here?")
+            success,fail = rollcall(event.message.text,self.d,self.sht)
+            print(success)
+            print(fail)
             text = "成功點名的有:\n"
             for name in success:
                 text = text + name + "\n"
@@ -91,9 +97,10 @@ class TocMachine(GraphMachine):
             send_text_message(reply_token,text)
         
     def is_rollcalling(self,event):
-        text=event.message.text
-        self.is_rollcalling_flag = True
-        if "完成點名" != text:
-            return True
+        if event.message.type == "text":
+            text=event.message.text
+            self.is_rollcalling_flag = True
+            if "完成點名" != text:
+                return True
     
     
