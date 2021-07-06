@@ -4,15 +4,20 @@ from utils import send_text_message,send_button_message,send_image_message
 
 from linebot.models import MessageTemplateAction
 
-from google_sheet_api import rollcall,open_google_sheet,create_dict
+from google_sheet_api import rollcall,open_google_sheet,create_dict,get_confirm_attendees
 
 class TocMachine(GraphMachine):
     
     def __init__(self, **machine_configs):
         self.machine = GraphMachine(model=self, **machine_configs)
+        self.init()
+        
+    def init(self):
         self.is_rollcalling_flag = False
         self.sht = None
         self.d = None
+        self.attendees = set()
+        self.confirm_attendees = set()
         
     def is_going_to_echo(self,event):
         text=event.message.text
@@ -38,10 +43,12 @@ class TocMachine(GraphMachine):
         
     def is_going_to_mes(self,event):
         text=event.message.text
-        if text=='1' or text == '2':
+        if text=='1' or text == '2' or text == '3':
             if text == '1':
-                gs = 'https://docs.google.com/spreadsheets/d/1ohd8YRgh9ghewZaSP39W0dhPyKw_xI0kbWu_SoClw3A/edit#gid=680064596'
+                gs = 'https://docs.google.com/spreadsheets/d/1z735DZS2StVi9jKFGtxpdBYlP41RGYV9aM1ikFUkc08/edit#gid=680064596'
             elif text == '2':
+                gs = 'https://docs.google.com/spreadsheets/d/1FezG1Io3rTJLtkJNBIL9LVNbTVCma8iwJWxjRUWHZ9E/edit#gid=680064596'
+            elif text == '3':
                 gs = 'https://docs.google.com/spreadsheets/d/1ohd8YRgh9ghewZaSP39W0dhPyKw_xI0kbWu_SoClw3A/edit#gid=680064596'
             self.sht = open_google_sheet(gs)
             return True
@@ -82,13 +89,14 @@ class TocMachine(GraphMachine):
             send_text_message(reply_token,text) 
         elif self.is_rollcalling_flag:
             print("here?")
-            success,fail = rollcall(event.message.text,self.d,self.sht)
+            success,fail,attendees_cur = rollcall(event.message.text,self.d,self.sht)
             print(success)
             print(fail)
+            self.attendees = self.attendees | attendees_cur
             text = "成功點名的有:\n"
             for name in success:
                 text = text + name + "\n"
-            text = text + "共" + str(len(success))+"人\n"
+            text = text + "共" + str(len(success))+"人\n\n"
             
             text = text + "沒認出是誰的有:\n"
             for name in fail:
@@ -103,4 +111,24 @@ class TocMachine(GraphMachine):
             if "完成點名" != text:
                 return True
     
+    def is_going_to_finish(self,event):
+        if event.message.type == "text":
+            text=event.message.text
+            self.is_rollcalling_flag = True
+            if "完成點名" in text:
+                return True
+            
+    def on_enter_finish(self,event):
+        reply_token = event.reply_token
+        self.confirm_attendees = get_confirm_attendees(self.sht)
+        text = "目前點到人數為"+str(len(self.attendees))+"\n未到會人位為：\n"
+        no_attend = self.confirm_attendees - self.attendees
+        for name in no_attend:
+            text = text + name + "\n"
+        text = text + "共" + str(len(no_attend))
+        send_text_message(reply_token,text)
     
+        # Initialize for next rollcall
+        self.init()
+        self.go_back()
+        

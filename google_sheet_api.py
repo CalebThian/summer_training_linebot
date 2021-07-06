@@ -64,7 +64,7 @@ def get_cell(target,d_list):
         keys = d_list[i].keys()
         for key in keys:
             if target == key:
-                return i,d_list[i][key]
+                return i,d_list[i][key],key
 
     # Check >50% accuracy        
     for i in range(len(d_list)):
@@ -76,10 +76,10 @@ def get_cell(target,d_list):
                     hit = hit + 1.    
             acc = hit/len(key)
             if acc >= 0.5:
-                return i,d_list[i][key]
+                return i,d_list[i][key],key
             
     # If not exists
-    return -1,"None"
+    return -1,"None","None"
 
 # 點名
 def attend(tick,sht):
@@ -98,30 +98,42 @@ def attend(tick,sht):
 def rollcall(name_list,d,sht):
     success = []
     tick = [[],[],[],[],[],[]]
+    attendees = set()
     fail = []
     for name in name_list.split():
         print(name)
-        i,cell = get_cell(name,d)
+        i,cell,attendee = get_cell(name,d)
         if i!=-1:
             success.append(name)
             tick[i].append(cell)
+            attendees.add(attendee)
         else:
             fail.append(name)
     
     attend(tick,sht)
     
-    return success,fail
+    return success,fail,attendees
 
-
-
-              
+def get_confirm_attendees(sht):
+    wks = sht.worksheets()
+    attendees = set()
+    for i in range(1,len(wks)):
+        wks_cur = wks[i]
+        name_list = wks_cur.get_values_batch(['B3:B'])[0][2:]
+        attend = wks_cur.get_values_batch(['D3:D'])[0][2:]
+        for j in range(len(name_list)):
+            if len(name_list[j])>0 and attend[j][0]=="TRUE":
+                attendees.add(name_list[j][0])
+    return attendees
 
 if __name__ == '__main__':
     #A1 = sht[1].cell('E51')
     #sht[1].update_value('E51','True')
     sht = open_google_sheet('https://docs.google.com/spreadsheets/d/1ohd8YRgh9ghewZaSP39W0dhPyKw_xI0kbWu_SoClw3A/edit#gid=680064596') 
-    print(len(sht.worksheets()))
-    d = create_dict("信息一",sht)
+    name_list = get_confirm_attendees(sht)
+    #print(len(sht.worksheets()))
+    
+    #d = create_dict("信息一",sht)
     #target = ""
     #i,cell = get_cell(target,d)
-    s,c = rollcall('静音\n謝亞城 田家樂 高苡程\n虛俊翰 恩慈高\n黃柏\n陳孜安 其恩\n黃凡芸 其恩路\n張晴雯 曾業偉\n王宏惠\nHsin 致美張\nChunyi\n得真',d,sht)
+    #s,c = rollcall('静音\n謝亞城 田家樂 高苡程\n虛俊翰 恩慈高\n黃柏\n陳孜安 其恩\n黃凡芸 其恩路\n張晴雯 曾業偉\n王宏惠\nHsin 致美張\nChunyi\n得真',d,sht)

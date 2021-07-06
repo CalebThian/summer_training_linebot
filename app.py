@@ -20,7 +20,8 @@ machine = TocMachine(
             "echo",
             "class",
             "mes",
-            "rollcall"],
+            "rollcall",
+            "finish"],
     transitions=[
         {"trigger": "advance","source": "user","dest": "echo","conditions": "is_going_to_echo"},
         {"trigger": "go_back","source": "echo","dest": "user"},
@@ -31,7 +32,10 @@ machine = TocMachine(
         
         {"trigger": "advance","source": "mes","dest": "rollcall","conditions": "is_going_to_rollcall"},
         
-        {"trigger": "advance","source": "rollcall","dest": "rollcall","conditions": "is_rollcalling"}
+        {"trigger": "advance","source": "rollcall","dest": "rollcall","conditions": "is_rollcalling"},
+        
+        {"trigger": "advance","source": "rollcall","dest": "finish","conditions": "is_going_to_finish"},
+        {"trigger": "go_back","source": "finish","dest": "user"}
     ],
     initial="user",
     auto_transitions=False,
