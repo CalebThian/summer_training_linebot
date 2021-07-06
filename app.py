@@ -9,7 +9,7 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 from fsm import TocMachine
 from utils import send_text_message
-#import pygraphviz
+import pygraphviz
 
 load_dotenv()
 
