@@ -19,15 +19,14 @@ class TocMachine(GraphMachine):
         self.attendees = set()
         self.confirm_attendees = set()
         
-    def is_going_to_echo(self,event):
+    def is_going_to_greetings(self,event):
         text=event.message.text
-        if "點名" in text:
-            return False
-        return True
+        if "打招呼" in text:
+            return True
     
-    def on_enter_echo(self,event):
+    def on_enter_greetings(self,event):
         reply_token = event.reply_token
-        text = "阿門"
+        text = "弟兄姊妹們平安喜樂，我是這次協助大家點名的機器人小夏！\n\n只要輸入“點名”，我就會開始協助弟兄姊妹點名哦！請按著指示與教學進行點名！\n\n願弟兄姊妹能專心進入這次夏季訓練的信息！"
         send_text_message(reply_token,text)
         self.go_back()
     

@@ -16,14 +16,14 @@ load_dotenv()
 
 machine = TocMachine(
     states=["user",
-            "echo",
+            "greetings",
             "class",
             "mes",
             "rollcall",
             "finish"],
     transitions=[
-        {"trigger": "advance","source": "user","dest": "echo","conditions": "is_going_to_echo"},
-        {"trigger": "go_back","source": "echo","dest": "user"},
+        {"trigger": "advance","source": "user","dest": "greetings","conditions": "is_going_to_greetings"},
+        {"trigger": "go_back","source": "greetings","dest": "user"},
         
         {"trigger": "advance","source": "user","dest": "class","conditions": "is_going_to_class"},
         
