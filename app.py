@@ -109,8 +109,8 @@ def webhook_handler():
         print(f"\nFSM STATE: {machine.state}")
         print(f"REQUEST BODY: \n{body}")
         response = machine.advance(event)
-        if response == False:
-            send_text_message(event.reply_token, "抱歉，請按正確格式重新輸入...")
+        #if response == False:
+        #    send_text_message(event.reply_token, "抱歉，請按正確格式重新輸入...")
 
     return "OK"
 

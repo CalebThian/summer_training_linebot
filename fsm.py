@@ -32,7 +32,7 @@ class TocMachine(GraphMachine):
     
     def is_going_to_class(self,event):
         text=event.message.text
-        if "點名" in text:
+        if text = "點名":
             return True
         
     def on_enter_class(self,event):
