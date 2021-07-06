@@ -55,7 +55,7 @@ class TocMachine(GraphMachine):
         
     def on_enter_mes(self,event):
         reply_token = event.reply_token
-        text = "請告訴我這是第幾篇信息？（如：“信息一”）"
+        text = "請問這是第幾篇信息呢？（如：“信息一”）"
         send_text_message(reply_token,text) 
         
     def is_going_to_rollcall(self,event):
