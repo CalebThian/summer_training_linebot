@@ -28,6 +28,7 @@ class TocMachine(GraphMachine):
         reply_token = event.reply_token
         text = "已中斷點名"
         send_text_message(reply_token,text)
+        self.go_back()
         
     def is_going_to_greetings(self,event):
         text=event.message.text
