@@ -188,7 +188,6 @@ pydicom==2.1.2
 pydocstyle @ file:///tmp/build/80754af9/pydocstyle_1598885001695/work
 pyflakes==2.2.0
 Pygments @ file:///tmp/build/80754af9/pygments_1604103097372/work
-pygraphviz @ file:///C:/Users/caleb/Downloads/pygraphviz-1.7-cp38-cp38-win_amd64.whl
 pygsheets==2.0.5
 pyinstaller==4.3
 pyinstaller-hooks-contrib==2021.1
