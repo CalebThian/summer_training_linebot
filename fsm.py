@@ -98,15 +98,17 @@ class TocMachine(GraphMachine):
             self.is_rollcalling_flag = True
             send_text_message(reply_token,text) 
         elif self.is_rollcalling_flag:
-            print("here?")
-            success,fail,attendees_cur = rollcall(event.message.text,self.d,self.sht)
-            print(success)
-            print(fail)
+            success,fail,maybe_success,attendees_cur = rollcall(event.message.text,self.d,self.sht)
             self.attendees = self.attendees | attendees_cur
             text = "成功點名的有:\n"
             for name in success:
                 text = text + name + "\n"
             text = text + "共" + str(len(success))+"人\n\n"
+            
+            text = text + "可能點錯的有:\n"
+            for pair in maybe_success:
+                text = text + "\"" + pair[0] + "\" 我認爲是 \"" + pair[1] +"\"\n"
+            text = text + "共" + str(len(maybe_success)) +"人\n\n"
             
             text = text + "沒認出是誰的有:\n"
             for name in fail:
