@@ -148,7 +148,7 @@ class TocMachine(GraphMachine):
             for name in r[1]:
                 text = text + "  " + name + "\n"
             total += len(r[1])
-        text = text + "共" + str(len(no_attend))
+        text = text + "共" + str(len(no_attend)) + "\n"
         
         early = classify(get_attendees(self.message,self.sht) - self.attendees,self.sht)
         text = text + "提早離開的有:\n"
@@ -157,7 +157,7 @@ class TocMachine(GraphMachine):
             for name in r[1]:
                 text = text + "  " + name + "\n"
             total += len(r[1])
-        text = text + "共" + str(len(early))
+        text = text + "共" + str(len(early)) + "\n"
         
         send_text_message(reply_token,text)
     
