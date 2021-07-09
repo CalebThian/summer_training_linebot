@@ -4,7 +4,7 @@ from utils import send_text_message,send_button_message,send_image_message
 
 from linebot.models import MessageTemplateAction
 
-from google_sheet_api import classify,rollcall,open_google_sheet,create_dict,get_confirm_attendees
+from google_sheet_api import classify,rollcall,open_google_sheet,create_dict,get_confirm_attendees,get_attendees
 
 class TocMachine(GraphMachine):
     
@@ -18,6 +18,7 @@ class TocMachine(GraphMachine):
         self.d = None
         self.attendees = set()
         self.confirm_attendees = set()
+        self.message = None 
         
     def is_going_to_end(self,event):
         text=event.message.text
@@ -84,9 +85,9 @@ class TocMachine(GraphMachine):
                '信息十二']
         for mes_name in mes:
             if mes_name in text:
-                message = mes_name
+                self.message = mes_name
                 print("If success:")
-                self.d = create_dict(message,self.sht)
+                self.d = create_dict(self.message,self.sht)
                 print("Success!")
                 return True
         
@@ -148,6 +149,16 @@ class TocMachine(GraphMachine):
                 text = text + "  " + name + "\n"
             total += len(r[1])
         text = text + "共" + str(len(no_attend))
+        
+        early = classify(get_attendees(self.message,self.sht) - self.attendees,self.sht)
+        text = text + "提早離開的有:\n"
+        for r in early:
+            text = text + "\n" +r[0] + "\n"
+            for name in r[1]:
+                text = text + "  " + name + "\n"
+            total += len(r[1])
+        text = text + "共" + str(len(early))
+        
         send_text_message(reply_token,text)
     
         # Initialize for next rollcall

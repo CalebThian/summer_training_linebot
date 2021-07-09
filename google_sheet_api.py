@@ -18,6 +18,7 @@ def message_col(wks):
     mes_list = wks[1].range('E2:P2')[0]
     for i in range(12):
         message_col[mes_list[i].value] = col_list[4+i]
+    return message_col
 
 # 查看Google sheet 内sheet 清單
 def get_sheet_list(sht):
@@ -149,20 +150,30 @@ def classify(name_set,sht):
     print(wks_name_set)
     return wks_name_set
             
+def get_attendees(message,sht):
+    wks = sht.worksheets()
+    attendees = set()
+    mes_alpha = message_col(wks)[message]
+    for i in range(1,len(wks)):
+        wks_cur = wks[i]
+        name_list = wks_cur.get_values_batch(['B3:B'])[0][2:]
+        attend = wks_cur.get_values_batch([mes_alpha+'3:'+mes_alpha])[0][2:]
+        for j in range(len(name_list)):
+            if len(name_list[j])>0 and attend[j][0]=="TRUE":
+                attendees.add(name_list[j][0])
+    return attendees
+        
         
 
 if __name__ == '__main__':
     #A1 = sht[1].cell('E51')
     #sht[1].update_value('E51','True')
     sht = open_google_sheet('https://docs.google.com/spreadsheets/d/1ohd8YRgh9ghewZaSP39W0dhPyKw_xI0kbWu_SoClw3A/edit#gid=680064596') 
-    A = set()
-    A.add("田家樂")
-    w = classify(A,sht)
-    print(w)
+
     #name_list = get_confirm_attendees(sht)
     #print(len(sht.worksheets()))
     
-    #d = create_dict("信息一",sht)
+    d = get_attendees("信息一",sht)
     #target = ""
     #i,cell = get_cell(target,d)
     #s,c = rollcall('静音\n謝亞城 田家樂 高苡程\n虛俊翰 恩慈高\n黃柏\n陳孜安 其恩\n黃凡芸 其恩路\n張晴雯 曾業偉\n王宏惠\nHsin 致美張\nChunyi\n得真',d,sht)
