@@ -62,13 +62,14 @@ def create_dict(message,sht):
     return d_list
 
 def get_cell(target,d_list):
+    # return sheet no., name, cell, policy(1:100%,0:50%)
 
     # Check 100% accuracy
     for i in range(len(d_list)):
         keys = d_list[i].keys()
         for key in keys:
             if target == key:
-                return i,d_list[i][key],key
+                return i,d_list[i][key],key,1
 
     # Check >50% accuracy        
     for i in range(len(d_list)):
@@ -80,10 +81,10 @@ def get_cell(target,d_list):
                     hit = hit + 1.    
             acc = hit/len(key)
             if acc >= 0.5:
-                return i,d_list[i][key],key
+                return i,d_list[i][key],key,0
             
     # If not exists
-    return -1,"None","None"
+    return -1,"None","None",-1
 
 # 點名
 def attend(tick,sht):
@@ -104,11 +105,15 @@ def rollcall(name_list,d,sht):
     tick = [[],[],[],[],[],[]]
     attendees = set()
     fail = []
+    maybe_success = []
     for name in name_list.split():
         print(name)
-        i,cell,attendee = get_cell(name,d)
+        i,cell,attendee,policy = get_cell(name,d)
         if i!=-1:
-            success.append(name)
+            if policy == 1:
+                success.append(name)
+            elif policy==0:
+                maybe_success.append([name,attendee])
             tick[i].append(cell)
             attendees.add(attendee)
         else:
@@ -116,7 +121,7 @@ def rollcall(name_list,d,sht):
     
     attend(tick,sht)
     
-    return success,fail,attendees
+    return success,maybe_success,fail,attendees
 
 def get_confirm_attendees(sht):
     wks = sht.worksheets()
