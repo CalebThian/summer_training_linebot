@@ -107,7 +107,6 @@ def rollcall(name_list,d,sht):
     fail = []
     maybe_success = []
     for name in name_list.split():
-        print(name)
         i,cell,attendee,policy = get_cell(name,d)
         if i!=-1:
             if policy == 1:
@@ -120,7 +119,6 @@ def rollcall(name_list,d,sht):
             fail.append(name)
     
     attend(tick,sht)
-    
     return success,maybe_success,fail,attendees
 
 def get_confirm_attendees(sht):
@@ -135,11 +133,33 @@ def get_confirm_attendees(sht):
                 attendees.add(name_list[j][0])
     return attendees
 
+def classify(name_set,sht):
+    wks = sht.worksheets()
+    wks_name_set = []
+    for i in range(1,len(wks)):
+        name_list = wks[i].get_values_batch(['B3:B'])[0][2:]    
+        temp_name_set = set()
+        for name in name_list:
+            if len(name):
+                temp_name_set.add(name[0])
+        wks_name_set.append([wks[i].title,temp_name_set])
+        
+    for s in wks_name_set:
+        s[1] = s[1].intersection(name_set)
+    print(wks_name_set)
+    return wks_name_set
+            
+        
+
 if __name__ == '__main__':
     #A1 = sht[1].cell('E51')
     #sht[1].update_value('E51','True')
     sht = open_google_sheet('https://docs.google.com/spreadsheets/d/1ohd8YRgh9ghewZaSP39W0dhPyKw_xI0kbWu_SoClw3A/edit#gid=680064596') 
-    name_list = get_confirm_attendees(sht)
+    A = set()
+    A.add("田家樂")
+    w = classify(A,sht)
+    print(w)
+    #name_list = get_confirm_attendees(sht)
     #print(len(sht.worksheets()))
     
     #d = create_dict("信息一",sht)

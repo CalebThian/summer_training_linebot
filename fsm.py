@@ -4,7 +4,7 @@ from utils import send_text_message,send_button_message,send_image_message
 
 from linebot.models import MessageTemplateAction
 
-from google_sheet_api import rollcall,open_google_sheet,create_dict,get_confirm_attendees
+from google_sheet_api import classify,rollcall,open_google_sheet,create_dict,get_confirm_attendees
 
 class TocMachine(GraphMachine):
     
@@ -98,8 +98,10 @@ class TocMachine(GraphMachine):
             self.is_rollcalling_flag = True
             send_text_message(reply_token,text) 
         elif self.is_rollcalling_flag:
-            success,fail,maybe_success,attendees_cur = rollcall(event.message.text,self.d,self.sht)
+            success,maybe_success,fail,attendees_cur = rollcall(event.message.text,self.d,self.sht)
+            print(attendees_cur)
             self.attendees = self.attendees | attendees_cur
+            print(len(self.attendees))
             text = "成功點名的有:\n"
             for name in success:
                 text = text + name + "\n"
@@ -134,9 +136,17 @@ class TocMachine(GraphMachine):
         reply_token = event.reply_token
         self.confirm_attendees = get_confirm_attendees(self.sht)
         text = "目前點到人數為"+str(len(self.attendees))+"\n未到會人位為：\n"
+        print(len(self.confirm_attendees))
+        print(len(self.attendees))
         no_attend = self.confirm_attendees - self.attendees
-        for name in no_attend:
-            text = text + name + "\n"
+        print(len(no_attend))
+        total = 0
+        result = classify(no_attend,self.sht)
+        for r in result:
+            text = text + "\n" +r[0] + "\n"
+            for name in r[1]:
+                text = text + "  " + name + "\n"
+            total += len(r[1])
         text = text + "共" + str(len(no_attend))
         send_text_message(reply_token,text)
     
